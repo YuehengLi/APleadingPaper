@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>California Pleading Paper Generator</title>
+    <title>California Pleading Paper Generator (CRC Formatting)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
@@ -11,7 +11,7 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Times+New+Roman&display=swap" rel="stylesheet">
      <style>
-        /* Custom CSS for Pleading Paper Format */
+        /* Custom CSS for Pleading Paper Format (CRC Inspired) */
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -21,13 +21,14 @@
             width: 8.5in;
             min-height: 11in;
             margin: 20px auto;
-            padding: 0.5in 0.5in 0.5in 1in; /* T, R, B, L margins */
+            /* Margins: Top (0.5in), Right (0.5in), Bottom (0.5in), Left (1in) */
+            padding: 0.5in 0.5in 0.5in 1in;
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
             position: relative;
             box-sizing: border-box;
             font-family: 'Times New Roman', Times, serif;
             font-size: 12pt;
-            line-height: 2; /* Double-spaced body */
+            line-height: 2; /* Default double-spaced */
             color: black;
         }
 
@@ -39,20 +40,21 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Line Numbers (Visual only, not included in Word export) */
+        /* Line Numbers (Visual only) */
         .line-numbers {
             position: absolute;
             left: 0.5in; top: 0.5in; bottom: 0.5in;
             width: 0.3in;
             font-size: 10pt;
-            line-height: 2;
+            line-height: 2; /* Match body double-spacing */
             text-align: right;
             color: #555;
             -webkit-user-select: none; user-select: none;
             font-family: 'Times New Roman', Times, serif;
+            padding-top: 0; /* Align with first line */
         }
 
-        /* Vertical Rules (Visual only, not included in Word export) */
+        /* Vertical Rules (Visual only) */
         .vertical-rule {
             position: absolute;
             top: 0.5in; bottom: 0.5in;
@@ -67,49 +69,53 @@
             position: relative;
         }
 
-        /* Attorney Info Block */
+        /* Attorney Info Block (CRC Rule 2.111(1)) */
         .attorney-info {
             font-size: 12pt;
             line-height: 1.2; /* Single-space */
-            margin-bottom: 1in;
+            /* Margin bottom ensures court name starts ~line 8 */
+            /* Approx line 8 = 0.5in top pad + 7 lines * (12pt * 2 line-height) */
+            /* This calculation is approximate; adjust margin as needed */
+            margin-bottom: calc(7 * 12pt * 2 * 0.166); /* Approx 7 double lines space */
             position: relative;
-            padding-top: 0px;
+            padding-top: 0px; /* Starts line 1 relative to padding */
         }
         .attorney-info p { margin: 0; padding: 0; }
 
-        /* Court Info Block */
+        /* Court Info Block (CRC Rule 2.111(2)) */
         .court-info {
             text-align: center;
             font-size: 12pt;
             line-height: 1.5;
-            margin-bottom: 0.5in;
+            margin-bottom: 0.5in; /* Space before caption */
             text-transform: uppercase;
+            /* No extra top margin needed due to attorney-info margin */
         }
         .court-info p { margin: 0; padding: 0; }
 
-        /* Caption Box */
+        /* Caption Box (CRC Rule 2.111(3)) */
         .caption-box {
             display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            grid-template-columns: 1fr auto 1fr; /* Left | vs. | Right */
             gap: 15px;
             border-top: 3px solid black;
             border-bottom: 3px solid black;
             padding: 10px 0;
-            margin-bottom: 0.5in;
-            min-height: 2.5in;
+            margin-bottom: 0.5in; /* Space before body */
+            min-height: 2in; /* Adjust as needed */
             font-size: 12pt;
             line-height: 1.5;
-            align-items: start;
+            align-items: start; /* Align content to top */
         }
         .caption-left, .caption-right { white-space: pre-line; }
         .caption-center { text-align: center; font-weight: bold; padding-top: 1.5em; }
 
-        /* Case Info Block */
+        /* Case Info Block (CRC Rule 2.111(4)) */
         .case-info {
             position: absolute;
-            top: 0; /* Adjusted by JS */
+            top: 0; /* Adjusted by JS to align with caption box top */
             right: 0; /* Align to right padding edge */
-            width: 45%;
+            width: 45%; /* Adjust width as needed */
             border-left: 1px solid black;
             padding-left: 15px;
             font-size: 12pt;
@@ -117,18 +123,27 @@
             text-align: left;
         }
         .case-info p { margin: 5px 0; }
-        .case-info .doc-title-in-case-block { font-weight: bold; text-transform: uppercase; }
+        .case-info .doc-title-in-case-block {
+             font-weight: bold;
+             text-transform: uppercase;
+             margin-top: 1em; /* Space above title within block */
+        }
 
-        /* Body Text Placeholder */
+        /* Body Text (CRC Rule 2.108) */
         .document-body {
             font-size: 12pt;
             line-height: 2; /* Double-spaced body */
             text-align: justify;
-            padding-top: 0.1in;
+            padding-top: 0.1in; /* Small space after caption area */
             margin: 0;
         }
-        .document-body p { margin-bottom: 1em; text-indent: 0.5in; }
-        .document-body p:first-child { text-indent: 0; }
+        .document-body p {
+            margin-bottom: 1em; /* Simulate double spacing */
+            text-indent: 0.5in; /* Standard paragraph indentation */
+        }
+        .document-body p:first-child {
+            text-indent: 0; /* No indent on first paragraph */
+        }
 
         /* Print Styles */
         @media print {
@@ -150,12 +165,18 @@
             .attorney-info, .court-info, .caption-box, .case-info, .document-title-centered, .document-body {
                 font-size: 12pt !important; font-family: 'Times New Roman', Times, serif !important;
             }
+            /* Ensure line heights print correctly */
             .document-body { line-height: 2 !important; }
             .attorney-info { line-height: 1.2 !important; }
             .court-info, .caption-box, .case-info { line-height: 1.5 !important; }
+            /* Adjust spacing for print */
+            .attorney-info { margin-bottom: calc(7 * 12pt * 2 * 0.166) !important; } /* Match visual spacing */
+            .court-info { margin-bottom: 0.5in !important; }
+            .caption-box { margin-bottom: 0.5in !important; }
+
             .case-info {
-                position: absolute !important; right: 0.5in !important;
-                top: var(--case-info-top-print, 3in) !important;
+                position: absolute !important; right: 0.5in !important; /* Align with right margin */
+                top: var(--case-info-top-print, 3in) !important; /* Use JS calculated top */
             }
             .caption-left, .caption-right { white-space: pre-line !important; }
         }
@@ -164,7 +185,7 @@
 <body class="bg-gray-100 p-4 md:p-8">
 
     <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">California Pleading Paper Generator</h1>
-    <p class="intro-text text-center text-gray-600 mb-8">Fill in the details below and click "Generate Pleading".</p>
+    <p class="intro-text text-center text-gray-600 mb-8">Fill in the details below and click "Generate Pleading". Adheres to basic CRC formatting.</p>
 
     <div class="input-form-container max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -264,8 +285,7 @@
                     <div class="court-info">
                         <p>${courtName}</p>
                         <p>COUNTY OF ${countyName}</p>
-                        <p>&nbsp;</p>
-                    </div>
+                        <p>&nbsp;</p> </div>
 
                     <div class="caption-box">
                         <div class="caption-left">${plaintiffNames}<p style="margin-top: 1em;">Plaintiff(s),</p></div>
@@ -275,13 +295,10 @@
 
                     <div class="case-info">
                         <p>Case No. ${caseNumber}</p>
-                        <p>&nbsp;</p>
-                        <p class="doc-title-in-case-block">${documentTitle}</p>
+                        <p>&nbsp;</p> <p class="doc-title-in-case-block">${documentTitle}</p>
                     </div>
 
-                    <div style="clear: both;"></div>
-
-                    <div class="document-body">
+                    <div style="clear: both;"></div> <div class="document-body">
                         <p>This is the beginning of the document body. Replace this text with the actual content of your pleading. This section uses standard paragraph formatting with double line spacing and indentation for subsequent paragraphs.</p>
                         <p>Subsequent paragraphs, like this one, should follow the numbering convention as required by court rules (e.g., starting with "1.", "2.", etc., which you would add manually to your text). Remember that the actual text area here is just a placeholder.</p>
                         <p>In a real application, you might integrate a rich text editor or allow users to paste content while preserving formatting. This generator focuses primarily on setting up the correct caption and page structure.</p>
@@ -299,14 +316,16 @@
                 const captionBox = pleadingContainer.querySelector('.caption-box');
                 const caseInfoBlock = pleadingContainer.querySelector('.case-info');
                 if (captionBox && caseInfoBlock) {
+                    // Align top of case info block with top of caption box
                     const topPosition = captionBox.offsetTop;
                     caseInfoBlock.style.top = `${topPosition}px`;
+                    // Store value for printing
                     pleadingContainer.style.setProperty('--case-info-top-print', `${topPosition}px`);
                 }
                 // Show Print and Download buttons
                 document.getElementById('printButton').style.display = 'inline-flex';
                 document.getElementById('downloadButton').style.display = 'inline-flex';
-            }, 100);
+            }, 100); // Delay to allow rendering
         }
 
         // Function to download pleading as DOCX
@@ -320,7 +339,7 @@
                     return;
                 }
 
-                // --- Check if libraries are loaded (accessing via window) ---
+                // --- Check if libraries are loaded ---
                 if (typeof window.htmlDocx === 'undefined' || !window.htmlDocx || typeof window.htmlDocx.asBlob !== 'function') {
                     console.error("html-docx-js library not loaded correctly (window.htmlDocx).");
                     alert("Error: The document conversion library (html-docx-js) did not load correctly. Cannot create Word file.");
@@ -329,11 +348,10 @@
                  if (typeof window.saveAs !== 'function') {
                     console.error("FileSaver.js library not loaded correctly (window.saveAs).");
                     alert("Error: The file saving library (FileSaver.js) did not load correctly. Cannot download file.");
-                    return; // Stop if saveAs is not available
+                    return;
                 }
 
-
-                // --- Prepare HTML ---
+                // --- Prepare HTML for Word Export ---
                 let preparedHtmlString;
                 try {
                     preparedHtmlString = prepareHtmlForDocx(contentElement);
@@ -343,24 +361,41 @@
                     return;
                 }
 
-                // --- Basic Styling for Word ---
+                // --- Basic Styling for Word (CRC Inspired) ---
+                // Using points (pt) where 1 inch = 72pt, 0.5 inch = 36pt
                 const styledHtml = `
                     <!DOCTYPE html>
                     <html lang="en">
-                    <head><meta charset="UTF-8"><style>
+                    <head><meta charset="UTF-8">
+                    <style>
                         body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; }
-                        p { margin-bottom: 0; margin-top: 0; }
-                        .attorney-info { line-height: 1.2; margin-bottom: 72pt; }
-                        .court-info { text-align: center; line-height: 1.5; margin-bottom: 36pt; text-transform: uppercase; }
-                        .caption-box-table { border-top: 3px solid black; border-bottom: 3px solid black; width: 100%; margin-bottom: 36pt; border-collapse: collapse; }
-                        .caption-box-table td { font-size: 12pt; line-height: 1.5; vertical-align: top; padding: 5px; }
-                        .caption-box-table .vs-cell { text-align: center; font-weight: bold; width: 10%; }
-                        .case-info-table { border-left: 1px solid black; padding-left: 10px; }
-                        .case-info-table p { line-height: 1.5; }
-                        .doc-title-in-case-block { font-weight: bold; text-transform: uppercase; }
-                        .document-body { line-height: 2; }
-                        .document-body p { text-indent: 36pt; margin-bottom: 10pt; }
-                        .document-body p:first-child { text-indent: 0; }
+                        p { margin: 0; padding: 0; /* Base paragraph style */ }
+
+                        /* Attorney Info: Single Spaced, 1 inch margin below */
+                        .attorney-info { line-height: 1.2; margin-bottom: 72pt; /* 1 inch */ }
+                        .attorney-info p { margin-bottom: 2pt; /* Small gap between lines */ }
+
+                        /* Court Info: 1.5 Spaced, Centered, Uppercase, 0.5 inch margin below */
+                        .court-info { text-align: center; line-height: 1.5; margin-bottom: 36pt; /* 0.5 inch */ text-transform: uppercase; }
+
+                        /* Caption Table: Borders, 1.5 Spaced, 0.5 inch margin below */
+                        .caption-box-table { border-top: 3pt solid black; border-bottom: 3pt solid black; width: 100%; margin-bottom: 36pt; /* 0.5 inch */ border-collapse: collapse; }
+                        .caption-box-table td { font-size: 12pt; line-height: 1.5; vertical-align: top; padding: 5pt; }
+                        .caption-box-table .vs-cell { text-align: center; font-weight: bold; width: 10%; padding-top: 1.5em; } /* Keep vertical alignment */
+
+                        /* Case Info within Table Cell: Border Left, 1.5 Spaced */
+                        .case-info-table { border-left: 1pt solid black; padding-left: 10pt; margin-top: 5pt; }
+                        .case-info-table p { line-height: 1.5; margin-bottom: 4pt; /* Spacing inside case info */ }
+                        .doc-title-in-case-block { font-weight: bold; text-transform: uppercase; margin-top: 1em; }
+
+                        /* Document Body: Double Spaced */
+                        .document-body { line-height: 2; margin-top: 0; } /* Start body right after caption */
+                        .document-body p {
+                            text-indent: 36pt; /* 0.5 inch */
+                            margin-bottom: 12pt; /* Approx double spacing gap */
+                            line-height: 2; /* Ensure paragraphs themselves are double spaced */
+                        }
+                        .document-body p:first-child { text-indent: 0; } /* No indent first paragraph */
                     </style></head>
                     <body>${preparedHtmlString}</body>
                     </html>`;
@@ -368,8 +403,9 @@
                 // --- Convert HTML to Blob ---
                 let converted;
                 try {
-                   converted = window.htmlDocx.asBlob(styledHtml, { // Use window.htmlDocx
+                   converted = window.htmlDocx.asBlob(styledHtml, {
                         orientation: 'portrait',
+                        // Margins are best set in Word, but we provide hints
                         margins: { top: 720, right: 720, bottom: 720, left: 1440, header: 0, footer: 0, gutter: 0 }
                     });
                 } catch (conversionError) {
@@ -380,7 +416,7 @@
 
                 // --- Save the file ---
                 try {
-                    window.saveAs(converted, 'pleading_document.docx'); // Use window.saveAs
+                    window.saveAs(converted, 'pleading_document_crc.docx'); // Changed filename slightly
                 } catch (saveError) {
                     console.error("Error saving the file:", saveError);
                     alert(`An error occurred while trying to save the file: ${saveError.message}\n\nThis could be due to browser settings or extensions. Please check the console.`);
@@ -392,44 +428,52 @@
             }
         }
 
-        // Helper function to slightly restructure HTML for better Word conversion
+        // Helper function to restructure HTML for Word conversion (Table approach)
         function prepareHtmlForDocx(contentElement) {
             const clone = contentElement.cloneNode(true);
             const captionBox = clone.querySelector('.caption-box');
             const caseInfo = clone.querySelector('.case-info');
             const courtInfo = clone.querySelector('.court-info');
+            const attorneyInfo = clone.querySelector('.attorney-info'); // Find attorney info
+            const documentBody = clone.querySelector('.document-body'); // Find document body
 
-            if (captionBox && caseInfo && courtInfo) {
+            // Ensure required elements exist before creating table
+            if (attorneyInfo && courtInfo && captionBox && caseInfo && documentBody) {
                 const plaintiffHtml = captionBox.querySelector('.caption-left')?.innerHTML || '';
                 const defendantHtml = captionBox.querySelector('.caption-right')?.innerHTML || '';
                 const caseInfoHtml = caseInfo.innerHTML;
+
+                // Create table structure for caption and case info
                 const tableHtml = `
-                    <table class="caption-box-table" style="width: 100%; border-collapse: collapse; border-top: 3px solid black; border-bottom: 3px solid black; margin-bottom: 36pt;">
+                    <table class="caption-box-table">
                         <tr>
-                            <td style="width: 45%; vertical-align: top; padding: 5px;">${plaintiffHtml}</td>
-                            <td class="vs-cell" style="width: 10%; vertical-align: top; text-align: center; font-weight: bold; padding: 5px; padding-top: 1.5em;">vs.</td>
-                            <td style="width: 45%; vertical-align: top; padding: 5px;">
+                            <td style="width: 45%;">${plaintiffHtml}</td>
+                            <td class="vs-cell" style="width: 10%;">vs.</td>
+                            <td style="width: 45%; vertical-align: top;">
                                 ${defendantHtml}
-                                <div class="case-info-table" style="border-left: 1px solid black; padding-left: 10px; margin-top: 5px;">${caseInfoHtml}</div>
+                                <div class="case-info-table">${caseInfoHtml}</div>
                             </td>
                         </tr>
                     </table>`;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = tableHtml;
-                const newTable = tempDiv.firstElementChild;
-                 if (courtInfo.nextSibling) {
-                    courtInfo.parentNode.insertBefore(newTable, courtInfo.nextSibling);
-                 } else {
-                    courtInfo.parentNode.appendChild(newTable);
-                 }
-                 captionBox.remove();
-                 caseInfo.remove();
+
+                // Build the final HTML string in the desired order for Word
+                let finalHtml = attorneyInfo.outerHTML;
+                finalHtml += courtInfo.outerHTML;
+                finalHtml += tableHtml; // Add the generated table
+                finalHtml += documentBody.outerHTML; // Add the body content
+
+                return finalHtml; // Return the re-ordered HTML
+
             } else {
+                 // If elements are missing, return a simplified version or log error
+                 console.error("Could not find all necessary elements for Word export restructuring.");
+                 // Fallback: return the original content minus problematic parts
                  caseInfo?.remove();
+                 clone.querySelectorAll('div[style*="clear: both"]').forEach(el => el.remove());
+                 return clone.innerHTML;
             }
-            clone.querySelectorAll('div[style*="clear: both"]').forEach(el => el.remove());
-            return clone.innerHTML;
         }
+
 
         // --- Event Listeners ---
         document.getElementById('generateButton').addEventListener('click', generatePleading);
